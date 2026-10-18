@@ -2926,8 +2926,7 @@ def static_file(filename, root,
             return HTTPResponse(status=304, **headers)
 
     ims = getenv('HTTP_IF_MODIFIED_SINCE')
-    if ims:
-        ims = parse_date(ims.split(";")[0].strip())
+    ims = parse_date(ims.split(";")[0].strip()) if ims else None
     if ims is not None and ims >= int(stats.st_mtime):
         return HTTPResponse(status=304, **headers)
 
