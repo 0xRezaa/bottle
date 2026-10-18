@@ -1593,6 +1593,8 @@ class BaseRequest(object):
 
     def __setattr__(self, name, value):
         if name == 'environ': return object.__setattr__(self, name, value)
+        if hasattr(getattr(type(self), name, None), '__set__'):
+            return object.__setattr__(self, name, value)
         key = 'bottle.request.ext.%s' % name
         if key in self.environ:
             raise AttributeError("Attribute already defined: %s" % name)
@@ -2926,8 +2928,7 @@ def static_file(filename, root,
             return HTTPResponse(status=304, **headers)
 
     ims = getenv('HTTP_IF_MODIFIED_SINCE')
-    if ims:
-        ims = parse_date(ims.split(";")[0].strip())
+    ims = parse_date(ims.split(";")[0].strip()) if ims else None
     if ims is not None and ims >= int(stats.st_mtime):
         return HTTPResponse(status=304, **headers)
 
