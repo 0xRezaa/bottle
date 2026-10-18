@@ -1593,6 +1593,8 @@ class BaseRequest(object):
 
     def __setattr__(self, name, value):
         if name == 'environ': return object.__setattr__(self, name, value)
+        if hasattr(getattr(type(self), name, None), '__set__'):
+            return object.__setattr__(self, name, value)
         key = 'bottle.request.ext.%s' % name
         if key in self.environ:
             raise AttributeError("Attribute already defined: %s" % name)
